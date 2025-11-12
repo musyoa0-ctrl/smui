@@ -271,8 +271,6 @@ class OfflineAICoordinator:
                 importlib.reload(transformers)
                 importlib.reload(torch)
                 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
-                global TRANSFORMERS_AVAILABLE
-                TRANSFORMERS_AVAILABLE = True
             except Exception as e:
                 self.logger.error(f"❌ Failed to install transformers: {e}")
                 return False

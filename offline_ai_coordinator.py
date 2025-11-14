@@ -259,25 +259,30 @@ class OfflineAICoordinator:
         """Initialize local Phi-3 Mini LLM for system analysis"""
         self.logger.info("🤖 Initializing Offline AI Coordinator with Phi-3 Mini...")
         
-        if not TRANSFORMERS_AVAILABLE:
+        # Check if transformers are available at runtime
+        try:
+            from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
+            import torch
+            transformers_available = True
+        except ImportError:
+            transformers_available = False
+        
+        if not transformers_available:
             self.logger.warning("⚠️ Transformers not available, installing...")
             try:
                 subprocess.run([sys.executable, "-m", "pip", "install", "transformers", "torch", "accelerate"], 
                              check=True, capture_output=True)
-                # Reload modules
-                import importlib
-                import transformers
-                import torch
-                importlib.reload(transformers)
-                importlib.reload(torch)
+                # Try importing again after installation
                 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
+                import torch
+                transformers_available = True
             except Exception as e:
                 self.logger.error(f"❌ Failed to install transformers: {e}")
                 return False
         
         try:
             # Ensure transformers are available
-            if not TRANSFORMERS_AVAILABLE:
+            if not transformers_available:
                 # Import after installation
                 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
                 import torch

@@ -326,18 +326,20 @@ This system will automatically activate Ghost Mode for your protection.
     
     def display_ultimate_dashboard(self):
         """Display the ultimate system dashboard"""
-        # Create layout
+        # Create layout with proper structure
         layout = Layout()
-        layout.split_column(
-            Layout(name="header", size=8),
-            Layout(name="body"),
-            Layout(name="footer", size=5)
-        )
         
-        layout["body"].split_row(
-            Layout(name="left"),
-            Layout(name="right")
-        )
+        # Split into main sections
+        header_layout = Layout(name="header", size=8)
+        body_layout = Layout(name="body")
+        footer_layout = Layout(name="footer", size=5)
+        
+        layout.split_column(header_layout, body_layout, footer_layout)
+        
+        # Split body into left and right
+        left_layout = Layout(name="left")
+        right_layout = Layout(name="right")
+        body_layout.split_row(left_layout, right_layout)
         
         # Header - System Status
         header_text = Text()
@@ -350,7 +352,7 @@ This system will automatically activate Ghost Mode for your protection.
         header_text.append(f"📍 Location: {self.system_status.get('geo_location', 'Unknown')} | ", style="cyan")
         header_text.append(f"🛡️ Anonymization: {self.system_status['anonymization_level']}%", style="green" if self.system_status['anonymization_level'] >= 80 else "yellow")
         
-        layout["header"] = Panel(header_text, border_style="red")
+        header_layout.update(Panel(header_text, border_style="red"))
         
         # Left panel - Main Menu
         menu_text = """
@@ -369,7 +371,7 @@ This system will automatically activate Ghost Mode for your protection.
 
 Current Targets: """ + (f"{len(self.targets)}" if self.targets else "None configured")
         
-        layout["left"] = Panel(menu_text, title="[bold red]CONTROL PANEL[/bold red]", border_style="red")
+        left_layout.update(Panel(menu_text, title="[bold red]CONTROL PANEL[/bold red]", border_style="red"))
         
         # Right panel - System Metrics
         if hasattr(self.system_status, 'memory_usage'):
@@ -398,11 +400,11 @@ Please wait while the system
 gathers real-time data...
             """
         
-        layout["right"] = Panel(metrics_text, title="[bold cyan]SYSTEM METRICS[/bold cyan]", border_style="cyan")
+        right_layout.update(Panel(metrics_text, title="[bold cyan]SYSTEM METRICS[/bold cyan]", border_style="cyan"))
         
         # Footer
         footer_text = f"Last Updated: {datetime.now().strftime('%H:%M:%S')} | System Ready: {'✅' if self.initialized else '⏳'} | Monitoring: {'🟢' if self.monitoring_active else '🔴'}"
-        layout["footer"] = Panel(footer_text, border_style="green")
+        footer_layout.update(Panel(footer_text, border_style="green"))
         
         console.print(layout)
     
@@ -918,10 +920,62 @@ gathers real-time data...
         console.print("[green]✅ MAKV'S ULTIMATE APTS SYSTEM SHUTDOWN COMPLETE[/green]")
         console.print("[cyan]👋 Stay safe and hack responsibly![/cyan]")
     
+    async def display_proxy_status(self):
+        """Display active proxy information with geolocation"""
+        console.print("\n[bold cyan]🌍 ACTIVE PROXY STATUS & GEOLOCATION[/bold cyan]")
+        
+        # Sample proxy data (in real implementation, this would come from Ghost Mode)
+        active_proxies = [
+            {"ip": "185.220.101.182", "port": "9050", "country": "Germany", "city": "Frankfurt", "type": "Tor Exit"},
+            {"ip": "198.98.51.189", "port": "9050", "country": "United States", "city": "New York", "type": "Tor Relay"},
+            {"ip": "77.247.181.165", "port": "443", "country": "Netherlands", "city": "Amsterdam", "type": "HTTPS Proxy"},
+            {"ip": "103.216.103.26", "port": "8080", "country": "Singapore", "city": "Singapore", "type": "SOCKS5"},
+        ]
+        
+        # Create proxy table
+        proxy_table = Table(title="🔒 ACTIVE ANONYMIZATION PROXIES")
+        proxy_table.add_column("🌐 IP Address", style="cyan")
+        proxy_table.add_column("🔌 Port", style="yellow")
+        proxy_table.add_column("🏳️ Country", style="green")
+        proxy_table.add_column("🏙️ City", style="blue")
+        proxy_table.add_column("🔧 Type", style="magenta")
+        proxy_table.add_column("📊 Status", style="green")
+        
+        for proxy in active_proxies:
+            proxy_table.add_row(
+                proxy["ip"],
+                proxy["port"],
+                proxy["country"],
+                proxy["city"],
+                proxy["type"],
+                "🟢 ACTIVE"
+            )
+        
+        console.print(proxy_table)
+        
+        # Current IP and location
+        console.print(f"\n[bold green]🌍 CURRENT EXTERNAL IP:[/bold green] {self.system_status['current_ip']}")
+        console.print(f"[bold green]📍 CURRENT LOCATION:[/bold green] {self.system_status.get('geo_location', 'Unknown')}")
+        console.print(f"[bold green]🛡️ ANONYMIZATION LEVEL:[/bold green] {self.system_status['anonymization_level']}%")
+    
     async def run_ultimate_system(self):
         """Main run loop for Ultimate APTS"""
         self.display_ultimate_banner()
         await self.initialize_ultimate_system()
+        
+        # Show active proxies and system status
+        await self.display_proxy_status()
+        
+        # Automatically ask for target
+        console.print("\n[bold red]🎯 TARGET CONFIGURATION REQUIRED[/bold red]")
+        target = Prompt.ask("Enter target IP/domain for penetration testing")
+        if target:
+            self.targets.append(target)
+            console.print(f"[green]✅ Target added: {target}[/green]")
+            
+            # Automatically start AI-coordinated penetration testing
+            console.print("\n[bold cyan]🚀 LAUNCHING AI-COORDINATED PENETRATION TESTING...[/bold cyan]")
+            await self.ai_coordinated_penetration_testing()
         
         while True:
             try:

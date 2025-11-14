@@ -287,8 +287,8 @@ class OfflineAICoordinator:
                 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
                 import torch
             
-            # Use Phi-3 Mini for best performance under 3GB
-            model_name = "microsoft/Phi-3-mini-4k-instruct"
+            # Use lightweight model for fast initialization
+            model_name = "gpt2"  # Fast, reliable, already downloaded
             
             self.logger.info(f"📥 Loading {model_name}...")
             

@@ -1,15 +1,31 @@
 #!/usr/bin/env python3
 """
 MAKV Ultimate APTS - Environment Setup
-Sets up optimal environment for the system
+Simple environment setup and testing script
 """
 
 import os
 import sys
+import subprocess
+from pathlib import Path
+
+def print_header():
+    print("🔧 MAKV APTS Environment Setup 🔧")
+    print("="*40)
+
+def check_python():
+    """Check Python version and executable"""
+    print(f"🐍 Python Version: {sys.version}")
+    print(f"🐍 Python Executable: {sys.executable}")
+    
+    if sys.version_info < (3, 8):
+        print("⚠️ Warning: Python 3.8+ recommended")
+    else:
+        print("✅ Python version OK")
 
 def setup_environment():
     """Set up optimal environment variables"""
-    print("🔧 Setting up environment...")
+    print("\n🌍 Setting up environment variables...")
     
     # Set environment variables for optimal performance
     env_vars = {
@@ -25,9 +41,11 @@ def setup_environment():
         os.environ[key] = value
         print(f"✅ Set {key}={value}")
     
-    # Create models directory
-    os.makedirs("./models", exist_ok=True)
-    print("✅ Created models directory")
+    # Create necessary directories
+    dirs = ["models", "logs", "temp", "data"]
+    for dir_name in dirs:
+        os.makedirs(f"./{dir_name}", exist_ok=True)
+        print(f"✅ Created {dir_name}/ directory")
 
 def test_components():
     """Test all system components"""
@@ -97,19 +115,56 @@ def test_components():
         print("💡 System will use rule-based fallback")
         return False
 
-def main():
-    print("🔥 MAKV Ultimate APTS - Environment Setup")
-    print("=" * 50)
+def test_system_files():
+    """Test if main system files exist"""
+    print("\n📄 Checking system files...")
     
+    required_files = [
+        "makv_ultimate_apts.py",
+        "offline_ai_coordinator.py", 
+        "advanced_ghost_mode.py"
+    ]
+    
+    all_present = True
+    
+    for file in required_files:
+        if Path(file).exists():
+            print(f"✅ {file}")
+        else:
+            print(f"❌ {file} missing")
+            all_present = False
+    
+    return all_present
+
+def main():
+    print_header()
+    
+    # Basic checks
+    check_python()
     setup_environment()
+    
+    # File checks
+    files_ok = test_system_files()
+    
+    # Component tests
     success = test_components()
     
-    if success:
-        print("\n🎉 Environment setup complete!")
+    print("\n" + "="*40)
+    print("🎯 ENVIRONMENT SETUP COMPLETE")
+    print("="*40)
+    
+    if success and files_ok:
+        print("✅ Environment ready!")
         print("🚀 All components working - AI mode available")
     else:
-        print("\n⚠️ Some components failed - fallback mode available")
+        print("⚠️ Some issues detected")
+        if not files_ok:
+            print("💡 Make sure you're in the correct directory")
+        if not success:
+            print("💡 Fallback mode available")
     
+    print(f"\n📍 Current directory: {os.getcwd()}")
+    print(f"📍 Python path: {sys.executable}")
     print("\n🚀 Ready to run: python3 makv_ultimate_apts.py")
 
 if __name__ == "__main__":

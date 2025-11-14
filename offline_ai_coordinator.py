@@ -276,6 +276,12 @@ class OfflineAICoordinator:
                 return False
         
         try:
+            # Ensure transformers are available
+            if not TRANSFORMERS_AVAILABLE:
+                # Import after installation
+                from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
+                import torch
+            
             # Use Phi-3 Mini for best performance under 3GB
             model_name = "microsoft/Phi-3-mini-4k-instruct"
             
